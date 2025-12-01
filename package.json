@@ -1,0 +1,15 @@
+{
+  "name": "aoc25",
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.20.0",
+  "dependencies": {
+    "@effect/platform-node": "https://pkg.pr.new/Effect-TS/effect-smol/@effect/platform-node@8bf52d4",
+    "effect": "https://pkg.pr.new/Effect-TS/effect-smol/effect@8bf52d4"
+  },
+  "devDependencies": {
+    "@effect/language-service": "^0.58.0",
+    "prettier": "^3.7.3",
+    "typescript": "^5.9.3"
+  }
+}
