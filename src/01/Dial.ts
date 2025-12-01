@@ -7,17 +7,27 @@ export class Dial extends ServiceMap.Service<Dial>()("01/Dial", {
     // on overflow, it wraps around
     let position = 50
 
+    // returns number of times the dial goes pass 0
     const rotate = Effect.fnUntraced(function* (s: string) {
       const instruction = yield* DialInstruction.parse(s)
-      switch (instruction._tag) {
-        case "Left":
-          position = (position - instruction.steps + 100) % 100
-          break
-        case "Right":
-          position = (position + instruction.steps) % 100
-          break
+      if (instruction.steps === 0) {
+        return 0
       }
-      return position
+
+      switch (instruction._tag) {
+        case "Left": {
+          const invertedPos = (100 - position) % 100
+          const next = invertedPos + instruction.steps
+          const passes = Math.floor(next / 100)
+          position = (100 - (next % 100)) % 100
+          return passes
+        }
+        case "Right": {
+          const next = position + instruction.steps
+          position = next % 100
+          return Math.floor(next / 100)
+        }
+      }
     })
 
     return {

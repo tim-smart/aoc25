@@ -3,7 +3,6 @@ import { Effect } from "effect"
 import { FileSystem } from "effect/platform"
 import { Dial } from "./Dial.ts"
 import { Stream } from "effect/stream"
-import { Filter } from "effect/data"
 
 const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem
@@ -13,8 +12,7 @@ const program = Effect.gen(function* () {
     Stream.decodeText(),
     Stream.splitLines,
     Stream.mapEffect((line) => dial.rotate(line)),
-    Stream.filter(Filter.fromPredicate((pos) => pos === 0)),
-    Stream.runCount,
+    Stream.runSum,
   )
 
   yield* Effect.log(`The dial password is: ${password}`)
