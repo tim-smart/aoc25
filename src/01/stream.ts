@@ -2,21 +2,20 @@ import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Effect } from "effect"
 import { FileSystem } from "effect/platform"
 import { Dial } from "./Dial.ts"
+import { Stream } from "effect/stream"
+import { Filter } from "effect/data"
 
 const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem
   const dial = yield* Dial
-  const input = (yield* fs.readFileString(`${import.meta.dirname}/input.txt`))
-    .trim()
-    .split("\n")
 
-  let password = 0
-  for (const line of input) {
-    yield* dial.rotate(line)
-    if (dial.isZero()) {
-      password += 1
-    }
-  }
+  const password = yield* fs.stream(`${import.meta.dirname}/input.txt`).pipe(
+    Stream.decodeText(),
+    Stream.splitLines,
+    Stream.mapEffect((line) => dial.rotate(line)),
+    Stream.filter(Filter.fromPredicate((pos) => pos === 0)),
+    Stream.runCount,
+  )
 
   yield* Effect.log(`The dial password is: ${password}`)
 })
