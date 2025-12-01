@@ -18,6 +18,9 @@ importers:
       '@effect/language-service':
         specifier: ^0.58.0
         version: 0.58.0
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.10.1
       prettier:
         specifier: ^3.7.3
         version: 3.7.3
