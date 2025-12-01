@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "type": "module",
   "packageManager": "pnpm@10.20.0",
+  "scripts": {
+    "dev": "node --experimental-strip-types"
+  },
   "dependencies": {
     "@effect/platform-node": "https://pkg.pr.new/Effect-TS/effect-smol/@effect/platform-node@8bf52d4",
     "effect": "https://pkg.pr.new/Effect-TS/effect-smol/effect@8bf52d4"

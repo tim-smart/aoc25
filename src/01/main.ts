@@ -12,8 +12,8 @@ const program = Effect.gen(function* () {
 
   let password = 0
   for (const line of input) {
-    yield* dial.rotate(line)
-    if (dial.isZero()) {
+    const pos = yield* dial.rotate(line)
+    if (pos === 0) {
       password += 1
     }
   }

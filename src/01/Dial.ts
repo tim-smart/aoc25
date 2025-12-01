@@ -7,8 +7,6 @@ export class Dial extends ServiceMap.Service<Dial>()("01/Dial", {
     // on overflow, it wraps around
     let position = 50
 
-    const isZero = () => position === 0
-
     const rotate = Effect.fnUntraced(function* (s: string) {
       const instruction = yield* DialInstruction.parse(s)
       switch (instruction._tag) {
@@ -24,7 +22,6 @@ export class Dial extends ServiceMap.Service<Dial>()("01/Dial", {
 
     return {
       rotate,
-      isZero,
       position() {
         return position
       },
