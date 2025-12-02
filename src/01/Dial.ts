@@ -1,11 +1,11 @@
-import { Effect, Layer, ServiceMap } from "effect"
+import { Effect, flow, Layer, ServiceMap } from "effect"
 import * as DialInstruction from "./DialInstruction.ts"
 
 export class Dial extends ServiceMap.Service<Dial>()("01/Dial", {
-  make: Effect.gen(function* () {
+  make: Effect.fn(function* (initialPosition: number) {
     // max position is 99, min is 0
     // on overflow, it wraps around
-    let position = 50
+    let position = initialPosition
 
     // returns number of times the dial goes pass 0
     const rotate = Effect.fnUntraced(function* (s: string) {
@@ -38,5 +38,9 @@ export class Dial extends ServiceMap.Service<Dial>()("01/Dial", {
     } as const
   }),
 }) {
-  static layer = Layer.effect(this, this.make)
+  static layer = Layer.effect(this, this.make(50))
+  static layerWith = flow(
+    Layer.effect(this, this.make),
+    Layer.provide(Layer.empty),
+  )
 }
