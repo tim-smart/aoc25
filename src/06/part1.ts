@@ -2,6 +2,7 @@ import { Effect } from "effect"
 import { DayInput } from "../DayInput.ts"
 import { NodeRuntime } from "@effect/platform-node"
 import { Data } from "effect/data"
+import assert from "node:assert"
 
 type Op = "+" | "*"
 
@@ -19,7 +20,7 @@ class Operation extends Data.Class<{
   }
 }
 
-const program = Effect.gen(function* () {
+const solution = Effect.gen(function* () {
   const input = yield* DayInput
   const lines = yield* input.lines(6)
   const { grid, operations } = parseGrid(lines)
@@ -31,15 +32,14 @@ const program = Effect.gen(function* () {
     part1 += answer
   })
 
-  console.log("Part 1:", part1)
-
   let part2 = 0
   operations.forEach((op, i) => {
     const numbers = getNumbers(grid, op.size, i)
     const answer = numbers.reduce(op.reducer())
     part2 += answer
   })
-  console.log("Part 2:", part2)
+
+  return { part1, part2 } as const
 })
 
 function parseGrid(lines: Array<string>): {
@@ -98,15 +98,22 @@ function getNumbers(
   return output
 }
 
-export const sample = DayInput.layerSample(`
+const sample = DayInput.layerSample(`
 123 328  51 64 
  45 64  387 23 
   6 98  215 314
 *   +   *   +  
 `)
 
-program.pipe(
-  // Effect.provide(sample),
+const testProgram = Effect.gen(function* () {
+  const result = yield* solution
+  assert.strictEqual(result.part1, 4277556)
+  assert.strictEqual(result.part2, 3263827)
+}).pipe(Effect.provide(sample))
+
+const mainProgram = solution.pipe(
+  Effect.flatMap(Effect.log),
   Effect.provide(DayInput.layer(2025)),
-  NodeRuntime.runMain,
 )
+
+testProgram.pipe(Effect.andThen(mainProgram), NodeRuntime.runMain)

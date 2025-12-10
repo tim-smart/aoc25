@@ -84,9 +84,9 @@ export class DayInput extends ServiceMap.Service<DayInput>()("DayInput", {
 
   static layerSample = (text: string) =>
     Layer.succeed(this, {
-      raw: () => Effect.succeed(text),
-      lines: () => Effect.succeed(text.split("\n")),
-      stream: () => Stream.fromArray(text.split("\n")),
+      raw: () => Effect.succeed(text.trim()),
+      lines: () => Effect.succeed(text.trim().split("\n")),
+      stream: () => Stream.fromArray(text.trim().split("\n")),
     })
 }
 
