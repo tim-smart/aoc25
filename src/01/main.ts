@@ -8,12 +8,17 @@ const program = Effect.gen(function* () {
   const dial = yield* Dial
   const input = yield* dayInput.lines(1)
 
-  let password = 0
+  let part1 = 0
+  let part2 = 0
   for (const line of input) {
-    password += yield* dial.rotate(line)
+    part2 += yield* dial.rotate(line)
+    if (dial.position() === 0) {
+      part1++
+    }
   }
 
-  yield* Effect.log(`The dial password is: ${password}`)
+  yield* Effect.log(`Part 1: ${part1}`)
+  yield* Effect.log(`Part 2: ${part2}`)
 })
 
 program.pipe(
