@@ -1,14 +1,12 @@
-import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { NodeRuntime } from "@effect/platform-node"
 import { Effect } from "effect"
-import { FileSystem } from "effect/platform"
 import { Dial } from "./Dial.ts"
+import { DayInput } from "../DayInput.ts"
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
+  const dayInput = yield* DayInput
   const dial = yield* Dial
-  const input = (yield* fs.readFileString(`${import.meta.dirname}/input.txt`))
-    .trim()
-    .split("\n")
+  const input = yield* dayInput.lines(1)
 
   let password = 0
   for (const line of input) {
@@ -19,6 +17,6 @@ const program = Effect.gen(function* () {
 })
 
 program.pipe(
-  Effect.provide([Dial.layer, NodeServices.layer]),
+  Effect.provide([Dial.layer, DayInput.layer(2025)]),
   NodeRuntime.runMain,
 )

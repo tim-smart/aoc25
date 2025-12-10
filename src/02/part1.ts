@@ -1,18 +1,15 @@
-import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { NodeRuntime } from "@effect/platform-node"
 import { Effect } from "effect"
 import { Filter } from "effect/data"
-import { FileSystem } from "effect/platform"
 import { Stream } from "effect/stream"
+import { DayInput } from "../DayInput.ts"
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
-  const ranges = (yield* fs.readFileString(`${import.meta.dirname}/input.txt`))
-    .trim()
-    .split(",")
-    .map((range) => {
-      const [start, end] = range.split("-").map(Number)
-      return [start!, end!] as const
-    })
+  const input = yield* DayInput
+  const ranges = (yield* input.raw(2)).split(",").map((range) => {
+    const [start, end] = range.split("-").map(Number)
+    return [start!, end!] as const
+  })
   const rangesWithEvenDigits = ranges.flatMap(([start, end]) => {
     const startDigits = start.toString().length
     const endDigits = end.toString().length
@@ -41,4 +38,8 @@ const program = Effect.gen(function* () {
   yield* Effect.log(`The sum is: ${sum}`)
 })
 
-program.pipe(Effect.provide(NodeServices.layer), NodeRuntime.runMain)
+export const sample = DayInput.layerSample(
+  `11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124`,
+)
+
+program.pipe(Effect.provide(DayInput.layer(2025)), NodeRuntime.runMain)

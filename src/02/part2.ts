@@ -1,18 +1,15 @@
-import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { NodeRuntime } from "@effect/platform-node"
 import { Effect } from "effect"
 import { Filter } from "effect/data"
-import { FileSystem } from "effect/platform"
 import { Stream } from "effect/stream"
+import { DayInput } from "../DayInput.ts"
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
-  const ranges = (yield* fs.readFileString(`${import.meta.dirname}/input.txt`))
-    .trim()
-    .split(",")
-    .map((range) => {
-      const [start, end] = range.split("-").map(Number)
-      return [start!, end!] as const
-    })
+  const input = yield* DayInput
+  const ranges = (yield* input.raw(2)).split(",").map((range) => {
+    const [start, end] = range.split("-").map(Number)
+    return [start!, end!] as const
+  })
 
   const sum = yield* Stream.fromArray(ranges).pipe(
     Stream.flatMap(([start, end]) => Stream.range(start, end)),
@@ -40,4 +37,4 @@ const repeatFilter = Filter.make((n: number) => {
   return Filter.failVoid
 })
 
-program.pipe(Effect.provide(NodeServices.layer), NodeRuntime.runMain)
+program.pipe(Effect.provide(DayInput.layer(2025)), NodeRuntime.runMain)

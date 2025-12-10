@@ -1,12 +1,10 @@
-import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { NodeRuntime } from "@effect/platform-node"
 import { Effect } from "effect"
-import { FileSystem } from "effect/platform"
+import { DayInput } from "../DayInput.ts"
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
-  const sum = (yield* fs.readFileString(`${import.meta.dirname}/input.txt`))
-    .trim()
-    .split("\n")
+  const input = yield* DayInput
+  const sum = (yield* input.lines(3))
     .map((bank) => {
       const digits = bank
         .split("")
@@ -21,4 +19,4 @@ const program = Effect.gen(function* () {
   console.log(sum)
 })
 
-program.pipe(Effect.provide(NodeServices.layer), NodeRuntime.runMain)
+program.pipe(Effect.provide(DayInput.layer(2025)), NodeRuntime.runMain)

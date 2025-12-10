@@ -1,12 +1,11 @@
-import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { NodeRuntime } from "@effect/platform-node"
 import { Effect, Number } from "effect"
-import { FileSystem } from "effect/platform"
+import { DayInput } from "../DayInput.ts"
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
-  const [inputFresh, inputAvailable] = (yield* fs.readFileString(
-    `${import.meta.dirname}/input.txt`,
-  ))
+  const input = yield* DayInput
+
+  const [inputFresh, inputAvailable] = (yield* input.raw(5))
     .trim()
     .split("\n\n")
 
@@ -24,4 +23,18 @@ const program = Effect.gen(function* () {
   console.log(`Part 1: ${availableAndFresh.length}`)
 })
 
-program.pipe(Effect.provide(NodeServices.layer), NodeRuntime.runMain)
+export const sample = DayInput.layerSample(`
+3-5
+10-14
+16-20
+12-18
+
+1
+5
+8
+11
+17
+32
+`)
+
+program.pipe(Effect.provide(DayInput.layer(2025)), NodeRuntime.runMain)

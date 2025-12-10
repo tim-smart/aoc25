@@ -1,14 +1,12 @@
-import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { NodeRuntime } from "@effect/platform-node"
 import { Effect } from "effect"
-import { FileSystem } from "effect/platform"
 import { Graph } from "effect/collections"
 import { Data } from "effect/data"
+import { DayInput } from "../DayInput.ts"
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
-  const rows = (yield* fs.readFileString(`${import.meta.dirname}/input.txt`))
-    .trim()
-    .split("\n")
+  const input = yield* DayInput
+  const rows = yield* input.lines(4)
 
   const indexes = new Map<Paper, number>()
   const graph = Graph.undirected<Paper, number>((graph) => {
@@ -83,4 +81,4 @@ class Paper extends Data.Class<{
   }
 }
 
-program.pipe(Effect.provide(NodeServices.layer), NodeRuntime.runMain)
+program.pipe(Effect.provide(DayInput.layer(2025)), NodeRuntime.runMain)

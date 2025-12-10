@@ -1,6 +1,6 @@
-import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { NodeRuntime } from "@effect/platform-node"
 import { Effect, Number } from "effect"
-import { FileSystem } from "effect/platform"
+import { DayInput } from "../DayInput.ts"
 
 type Range = {
   minimum: number
@@ -8,10 +8,8 @@ type Range = {
 }
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
-  const input = (yield* fs.readFileString(`${import.meta.dirname}/input.txt`))
-    .trim()
-    .split("\n\n")[0]!
+  const dayInput = yield* DayInput
+  const input = (yield* dayInput.raw(5)).split("\n\n")[0]!
 
   const ranges = new Set<Range>()
 
@@ -53,4 +51,4 @@ const program = Effect.gen(function* () {
   console.log(`Part 2: ${total}`)
 })
 
-program.pipe(Effect.provide(NodeServices.layer), NodeRuntime.runMain)
+program.pipe(Effect.provide(DayInput.layer(2025)), NodeRuntime.runMain)

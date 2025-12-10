@@ -1,16 +1,14 @@
-import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { NodeRuntime } from "@effect/platform-node"
 import { Effect } from "effect"
-import { FileSystem } from "effect/platform"
 import { Dial } from "./Dial.ts"
 import { Stream } from "effect/stream"
+import { DayInput } from "../DayInput.ts"
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
+  const input = yield* DayInput
   const dial = yield* Dial
 
-  const password = yield* fs.stream(`${import.meta.dirname}/input.txt`).pipe(
-    Stream.decodeText(),
-    Stream.splitLines,
+  const password = yield* input.stream(1).pipe(
     Stream.mapEffect((line) => dial.rotate(line)),
     Stream.runSum,
   )
@@ -19,6 +17,6 @@ const program = Effect.gen(function* () {
 })
 
 program.pipe(
-  Effect.provide([Dial.layer, NodeServices.layer]),
+  Effect.provide([Dial.layer, DayInput.layer(2025)]),
   NodeRuntime.runMain,
 )
