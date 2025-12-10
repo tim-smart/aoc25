@@ -1,17 +1,22 @@
 import { Effect } from "effect"
 import { DayInput } from "../DayInput.ts"
 import { NodeRuntime } from "@effect/platform-node"
+import { Data } from "effect/data"
 
 type Op = "+" | "*"
 
-interface Operation {
-  readonly op: Op
-  readonly size: number
-}
-
-const reducers: Record<Op, (acc: number, val: number) => number> = {
-  "+": (acc, val) => acc + val,
-  "*": (acc, val) => acc * val,
+class Operation extends Data.Class<{
+  op: Op
+  size: number
+}> {
+  reducer(): (acc: number, val: number) => number {
+    switch (this.op) {
+      case "+":
+        return (acc, val) => acc + val
+      case "*":
+        return (acc, val) => acc * val
+    }
+  }
 }
 
 const program = Effect.gen(function* () {
@@ -21,9 +26,8 @@ const program = Effect.gen(function* () {
 
   let part1 = 0
   operations.forEach((op, i) => {
-    const reducer = reducers[op.op]
     const numbers = grid.map((row) => Number(row[i]!.trim()))
-    const answer = numbers.reduce(reducer)
+    const answer = numbers.reduce(op.reducer())
     part1 += answer
   })
 
@@ -31,9 +35,8 @@ const program = Effect.gen(function* () {
 
   let part2 = 0
   operations.forEach((op, i) => {
-    const reducer = reducers[op.op]
     const numbers = getNumbers(grid, op.size, i)
-    const answer = numbers.reduce(reducer)
+    const answer = numbers.reduce(op.reducer())
     part2 += answer
   })
   console.log("Part 2:", part2)
@@ -49,10 +52,12 @@ function parseGrid(lines: Array<string>): {
   for (let i = 0; i < matches.length; i++) {
     const match = matches[i]!
     const isLast = i === matches.length - 1
-    operations.push({
-      op: match[1] as Op,
-      size: isLast ? match[0]!.length : match[0]!.length - 1,
-    })
+    operations.push(
+      new Operation({
+        op: match[1] as Op,
+        size: isLast ? match[0]!.length : match[0]!.length - 1,
+      }),
+    )
   }
 
   const grid: Array<Array<string>> = []
